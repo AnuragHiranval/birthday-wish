@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Happy Birthday</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    height: 100vh;
+    background: radial-gradient(circle at top, #1a2a6c, #b21f1f, #fdbb2d);
+    overflow: hidden;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+}
+
+/* 🎂 Card */
+.card {
+    position: relative;
+    z-index: 5;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(12px);
+    padding: 45px 60px;
+    border-radius: 22px;
+    text-align: center;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.45);
+    animation: entry 1.5s ease;
+}
+
+@keyframes entry {
+    from { transform: scale(0.3) rotateX(90deg); opacity: 0; }
+    to { transform: scale(1) rotateX(0); opacity: 1; }
+}
+
+h1 {
+    font-size: 42px;
+    margin-bottom: 8px;
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 10px #ffeb3b; }
+    to { text-shadow: 0 0 30px #ff5722; }
+}
+
+.name {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.msg {
+    font-size: 17px;
+    opacity: 0.9;
+}
+
+/* 🎁 Gift Section */
+.gift-box {
+    margin: 30px auto 0;
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #ff5252, #ff1744);
+    border-radius: 18px;
+    position: relative;
+    cursor: pointer;
+    animation: bounce 1.8s infinite;
+    box-shadow: 0 0 25px rgba(255,255,255,0.6);
+}
+
+@keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+.gift-box::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 15px;
+    background: gold;
+    top: 50px;
+}
+
+.gift-box::after {
+    content: '🎁';
+    position: absolute;
+    font-size: 42px;
+    top: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.gift-text {
+    display: none;
+    margin-top: 18px;
+    font-size: 18px;
+    color: #ffeb3b;
+    animation: fadeIn 1s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 🎈 Balloons */
+.balloon {
+    position: absolute;
+    bottom: -120px;
+    width: 45px;
+    height: 60px;
+    border-radius: 50%;
+    animation: floatUp linear infinite, sway ease-in-out infinite;
+}
+
+.balloon::after {
+    content: '';
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    width: 2px;
+    height: 35px;
+    background: rgba(255,255,255,0.7);
+}
+
+@keyframes floatUp {
+    from { transform: translateY(0); }
+    to { transform: translateY(-120vh); }
+}
+
+@keyframes sway {
+    0%,100% { margin-left: 0; }
+    50% { margin-left: 25px; }
+}
+
+/* 🎆 Canvas */
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<div class="card">
+    <h1>🎉 Happy Birthday 🎉</h1>
+    <div class="name"><b>Dear Anurag 💖</b></div>
+    <div class="msg">
+        Wishing you smiles, success and joy ✨
+    </div>
+
+    <!-- 🎁 Gift -->
+    <div class="gift-box" onclick="openGift()"></div>
+    <div id="giftText" class="gift-text">
+        🎊 Surprise! 🎊<br>
+        This gift is full of love 💝<br>
+        Always stay happy 😊
+    </div>
+</div>
+
+<script>
+/* 🎁 Gift Click */
+function openGift() {
+    document.querySelector(".gift-box").style.animation = "none";
+    document.getElementById("giftText").style.display = "block";
+}
+
+/* 🎈 Balloons */
+for (let i = 0; i < 18; i++) {
+    let b = document.createElement("div");
+    b.className = "balloon";
+    b.style.left = Math.random() * 100 + "vw";
+    b.style.background = `hsl(${Math.random()*360},70%,60%)`;
+    b.style.animationDuration = (6 + Math.random() * 6) + "s";
+    document.body.appendChild(b);
+}
+
+/* 🎆 Fireworks */
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let particles = [];
+
+function firework() {
+    let x = Math.random() * canvas.width;
+    let y = Math.random() * canvas.height / 2;
+    let colors = ["#ff5252","#ffeb3b","#69f0ae","#40c4ff"];
+
+    for (let i = 0; i < 40; i++) {
+        particles.push({
+            x, y,
+            dx: Math.cos(i) * Math.random() * 4,
+            dy: Math.sin(i) * Math.random() * 4,
+            life: 60,
+            color: colors[Math.floor(Math.random()*colors.length)]
+        });
+    }
+}
+
+function animate() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach((p,i)=>{
+        p.x += p.dx;
+        p.y += p.dy;
+        p.life--;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x,p.y,3,3);
+        if (p.life <= 0) particles.splice(i,1);
+    });
+    requestAnimationFrame(animate);
+}
+
+setInterval(firework, 900);
+animate();
+
+window.onresize = () => {
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+};
+</script>
+
+</body>
+</html>
